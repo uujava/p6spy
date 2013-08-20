@@ -333,7 +333,7 @@ public class P6PreparedStatement extends P6Statement implements PreparedStatemen
                     growValues(i);
                 }
                 if (o instanceof java.util.Date) {
-                    values[i] = new SimpleDateFormat(P6SpyOptions.getDatabaseDialectDateFormat()).format(o);
+                    values[i] = new SimpleDateFormat(P6SpyOptions.INSTANCE.getDatabaseDialectDateFormat()).format(o);
                 }
                 else if ( o instanceof byte[] ) {
                     values[i] = toHexString( (byte[])o );

@@ -199,7 +199,7 @@ public class P6LogQuery {
     }
 
     public synchronized static void initMethod() {
-        String appender = P6SpyOptions.getAppender();
+        String appender = P6SpyOptions.INSTANCE.getAppender();
 
         if (appender == null) {
             appender = "com.p6spy.engine.logging.appender.FileLogger";
@@ -220,19 +220,19 @@ public class P6LogQuery {
 
         if (logger != null) {
             if (logger instanceof FileLogger) {
-                String logfile = P6SpyOptions.getLogfile();
+                String logfile = P6SpyOptions.INSTANCE.getLogfile();
                 logfile = (logfile == null) ? "spy.log" : logfile;
 
                 ((FileLogger) logger).setLogfile(logfile);
             }
         }
 
-        if (P6SpyOptions.getFilter()) {
-            includeTables = parseCSVList(P6SpyOptions.getInclude());
-            excludeTables = parseCSVList(P6SpyOptions.getExclude());
+        if (P6SpyOptions.INSTANCE.getFilter()) {
+            includeTables = parseCSVList(P6SpyOptions.INSTANCE.getInclude());
+            excludeTables = parseCSVList(P6SpyOptions.INSTANCE.getExclude());
         }
-        includeCategories = parseCSVList(P6SpyOptions.getIncludecategories());
-        excludeCategories = parseCSVList(P6SpyOptions.getExcludecategories());
+        includeCategories = parseCSVList(P6SpyOptions.INSTANCE.getIncludecategories());
+        excludeCategories = parseCSVList(P6SpyOptions.INSTANCE.getExcludecategories());
     }
 
     static public PrintStream logPrintStream(String file) {
@@ -240,7 +240,7 @@ public class P6LogQuery {
         try {
             String path = P6Util.classPathFile(file);
             file = (path == null) ? file : path;
-            ps = P6Util.getPrintStream(file, P6SpyOptions.getAppend());
+            ps = P6Util.getPrintStream(file, P6SpyOptions.INSTANCE.getAppend());
         } catch (IOException io) {
             P6LogQuery.error("Error opening " + file + ", " + io.getMessage());
             ps = null;
@@ -287,7 +287,7 @@ public class P6LogQuery {
     static protected void doLog(int connectionId, long elapsed, String category, String prepared, String sql) {
         if (logger != null) {
             java.util.Date now = P6Util.timeNow();
-            SimpleDateFormat sdf = P6SpyOptions.getDateformatter();
+            SimpleDateFormat sdf = P6SpyOptions.INSTANCE.getDateformatter();
             String stringNow;
             if (sdf == null) {
                 stringNow = Long.toString(now.getTime());
@@ -297,8 +297,8 @@ public class P6LogQuery {
 
             logger.logSQL(connectionId, stringNow, elapsed, category, prepared, sql);
 
-            boolean stackTrace = P6SpyOptions.getStackTrace();
-            String stackTraceClass = P6SpyOptions.getStackTraceClass();
+            boolean stackTrace = P6SpyOptions.INSTANCE.getStackTrace();
+            String stackTraceClass = P6SpyOptions.INSTANCE.getStackTraceClass();
             if (stackTrace) {
                 Exception e = new Exception();
                 if (stackTraceClass != null) {
@@ -324,7 +324,7 @@ public class P6LogQuery {
     }
 
     static boolean isLoggable(String sql) {
-        return (P6SpyOptions.getFilter() == false || queryOk(sql));
+        return (P6SpyOptions.INSTANCE.getFilter() == false || queryOk(sql));
     }
 
     static boolean isCategoryOk(String category) {
@@ -344,7 +344,7 @@ public class P6LogQuery {
     }
 
     static boolean queryOk(String sql) {
-        if ( P6SpyOptions.getSQLExpression() != null) {
+        if ( P6SpyOptions.INSTANCE.getSQLExpression() != null) {
             return sqlOk(sql);
         } else {
             return ((includeTables == null || includeTables.length == 0 || foundTable(sql, includeTables))) && !foundTable(sql, excludeTables);
@@ -352,7 +352,7 @@ public class P6LogQuery {
     }
 
     static boolean sqlOk(String sql) {
-        String sqlexpression = P6SpyOptions.getSQLExpression();
+        String sqlexpression = P6SpyOptions.INSTANCE.getSQLExpression();
         return Pattern.matches(sqlexpression, sql);
     }
 
@@ -440,7 +440,7 @@ public class P6LogQuery {
     //->JAW: new method that checks to see if this statement should be logged based
     //on whether on not it has taken greater than x amount of time.
     static private boolean meetsThresholdRequirement(long timeTaken) {
-        long executionThreshold = P6SpyOptions.getExecutionThreshold();
+        long executionThreshold = P6SpyOptions.INSTANCE.getExecutionThreshold();
 
         if (executionThreshold <= 0) {
             return true;

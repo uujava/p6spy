@@ -92,7 +92,7 @@ import java.sql.*;
 import java.util.*;
 
 
-public class P6TestBasics extends TestCase {
+public class P6TestBasics extends P6TestFramework {
 
     public P6TestBasics(java.lang.String testName) {
         super(testName);
@@ -112,24 +112,24 @@ public class P6TestBasics extends TestCase {
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        P6TestUtil.unloadDrivers();
+        unloadDrivers();
     }
 
     public void testNative() throws Exception {
         // load the native driver
-        Map properties = P6TestUtil.getDefaultPropertyFile();
-        P6TestUtil.reloadProperty(properties);
-        connection = P6TestUtil.loadDrivers("p6realdriver");
+        Map properties = getDefaultPropertyFile();
+        reloadProperty(properties);
+        connection = loadDrivers("p6realdriver");
         sqltests();
-        P6TestUtil.unloadDrivers();
+        unloadDrivers();
     }
 
     public void testSpy() throws Exception {
         // load the p6log driver
-        Map properties = P6TestUtil.getDefaultPropertyFile();
-        P6TestUtil.reloadProperty(properties);
+        Map properties = getDefaultPropertyFile();
+        reloadProperty(properties);
 
-        connection = P6TestUtil.loadDrivers("p6driver");
+        connection = loadDrivers("p6driver");
         sqltests();
     }
 

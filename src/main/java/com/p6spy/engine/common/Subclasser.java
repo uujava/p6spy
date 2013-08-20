@@ -59,6 +59,12 @@
  * SUCH DAMAGE.
  */
 
+package com.p6spy.engine.common;
+
+import javax.sql.DataSource;
+import java.io.*;
+import java.lang.reflect.*;
+
 /**
  * Description: Creates a subclass from the specifed DataSource to wrap in
  *		the p6spy functionality
@@ -78,12 +84,6 @@
  * Class to generate subclasses of DataSources that wrap with P6Spy
  *
  */
-package com.p6spy.engine.common;
-
-import javax.sql.DataSource;
-import java.io.*;
-import java.lang.reflect.*;
-
 public class Subclasser {
   public static String DELIMITER = System.getProperty("file.separator");
   public static String NEWLINE   = System.getProperty("line.separator");

@@ -62,7 +62,7 @@ public class BatchFileLogger extends FileLogger {
     @Override
     public void setLogfile(String fileName) {
         try {
-            boolean append = P6SpyOptions.getAppend();
+            boolean append = P6SpyOptions.INSTANCE.getAppend();
             endOfStatement = append && 0L < new File(fileName).length();
             qlog = new PrintStream(new FileOutputStream(fileName, append));
         } catch (IOException e) {

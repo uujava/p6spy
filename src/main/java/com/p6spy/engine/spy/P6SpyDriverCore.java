@@ -157,13 +157,6 @@
 
 package com.p6spy.engine.spy;
 
-import com.p6spy.engine.common.OptionReloader;
-import com.p6spy.engine.common.P6LogQuery;
-import com.p6spy.engine.common.P6Options;
-import com.p6spy.engine.common.P6SpyOptions;
-import com.p6spy.engine.common.P6SpyProperties;
-import com.p6spy.engine.common.P6Util;
-
 import java.sql.Connection;
 import java.sql.Driver;
 import java.sql.DriverManager;
@@ -176,6 +169,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Logger;
+
+import com.p6spy.engine.common.OptionReloader;
+import com.p6spy.engine.common.P6LogQuery;
+import com.p6spy.engine.common.P6Options;
+import com.p6spy.engine.common.P6SpyOptions;
 
 public abstract class P6SpyDriverCore implements Driver {
 
@@ -225,17 +223,13 @@ public abstract class P6SpyDriverCore implements Driver {
 
         foundSpyProperties = true;
 
-        P6SpyProperties properties = new P6SpyProperties();
-        P6SpyOptions coreOptions = new P6SpyOptions();
-        OptionReloader.add(coreOptions, properties);
-
         // now register the core options file with the reloader
 
         String className = "no class";
         String classType = "driver";
         try {
-            List<String> driverNames = P6SpyOptions.allDriverNames();
-            List modules = P6SpyOptions.allModules();
+            List<String> driverNames = P6SpyOptions.INSTANCE.allDriverNames();
+            List modules = P6SpyOptions.INSTANCE.allModules();
 
             boolean hasModules = modules.size() > 0;
 
@@ -257,7 +251,7 @@ public abstract class P6SpyDriverCore implements Driver {
                 className = driverName;
                 deregister(className);
                 Driver realDriver = (Driver) P6Util.forName(className).newInstance();
-                if (P6SpyOptions.getDeregisterDrivers()) {
+                if (P6SpyOptions.INSTANCE.getDeregisterDrivers()) {
                     // just in case you had to deregister
                     DriverManager.registerDriver(realDriver);
                 }
@@ -327,15 +321,15 @@ public abstract class P6SpyDriverCore implements Driver {
         if (size > 0) {
             for (int i = 0; i < size; i++) {
                 Driver driver = dereg.get(i);
-                if (P6SpyOptions.getDeregisterDrivers()) {
+//                if (P6SpyOptions.getDeregisterDrivers()) {
                     P6LogQuery.info("deregistering driver " + driver.getClass().getName());
                     DriverManager.deregisterDriver(driver);
-                } else {
-                    P6LogQuery
-                        .error("driver "
-                            + driver.getClass().getName()
-                            + " is a real driver in spy.properties, but it has been loaded before p6spy.  p6spy will not wrap these connections.  Either prevent the driver from loading, or try setting 'deregisterdrivers' to true in spy.properties");
-                }
+//                } else {
+//                    P6LogQuery
+//                        .error("driver "
+//                            + driver.getClass().getName()
+//                            + " is a real driver in spy.properties, but it has been loaded before p6spy.  p6spy will not wrap these connections.  Either prevent the driver from loading, or try setting 'deregisterdrivers' to true in spy.properties");
+//                }
             }
         }
 
@@ -370,7 +364,7 @@ public abstract class P6SpyDriverCore implements Driver {
     }
 
     private String getRealUrl(String url) {
-        if (P6SpyOptions.getUsePrefix()) {
+        if (P6SpyOptions.INSTANCE.getUsePrefix()) {
             return url.startsWith("p6spy:") ? url.substring("p6spy:".length()) : null;
         } else {
             return url;

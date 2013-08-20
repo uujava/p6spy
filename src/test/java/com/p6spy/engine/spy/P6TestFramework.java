@@ -124,9 +124,15 @@
 package com.p6spy.engine.spy;
 
 import junit.framework.*;
+
 import java.sql.*;
 import java.io.*;
 import java.util.*;
+
+import org.hsqldb.Server;
+import org.hsqldb.persist.HsqlProperties;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 
 import com.p6spy.engine.common.*;
 
@@ -142,32 +148,66 @@ public abstract class P6TestFramework extends TestCase {
     }
 
     protected Connection connection = null;
+    private Server server;
 
-    @Override
-    protected void setUp() {
+    protected void setUp() throws Exception {
+        new File("p6spy-test.hsqldb.script").delete();
+        new File("p6spy-test.hsqldb.log").delete();
+        new File("p6spy-test.hsqldb.properties").delete();
+        HsqlProperties p = new HsqlProperties();
+        p.setProperty("server.database.0","mem:p6spy");
+        p.setProperty("server.dbname.0","p6spy");
+        // set up the rest of properties
+        
+        // alternative to the above is
+        server = new Server();
+        server.setProperties(p);
+        server.setLogWriter(null); // can use custom writer
+        server.setErrWriter(null); // can use custom writer
+        server.start();
+        // we are going to use a testspy.forms file for these tests
+        List forms = getDefaultSpyForms();
+        writeFile("testspy.forms", forms);
+
+        // we are going to use the reloadtest.properties file for all tests
+        // this is a scratch file that won't hurt spy.properties
+        reloadProperty(getDefaultPropertyFile());
+        connection = loadDrivers("p6driver");
+        printAllDrivers();
+    }
+    
+    protected void tearDown() throws Exception {
+        server.shutdown();
+    }
+    
+    public Connection loadDrivers(String drivernameProperty) throws SQLException, IOException, ClassNotFoundException {
+        Properties props = loadProperties("P6Test.properties");
+        String drivername = props.getProperty(drivernameProperty);
+        String user = props.getProperty("user");
+        String password = props.getProperty("password");
+        String url = props.getProperty("url");
+
+        System.err.println("UTIL REGISTERING DRIVER PROPERTY == "+drivernameProperty+" TO REGISTER DRIVER == "+drivername);
+        P6Util.forName(drivername);
+        Driver driver = DriverManager.getDriver(url);
+        System.err.println("UTIL USING DRIVER == "+driver.getClass().getName()+" FOR URL "+url);
+        Connection connection = DriverManager.getConnection(url, user, password);
+        printAllDrivers();
+        return connection;
+    }
+    
+    protected void unloadDrivers() throws Exception {
+        Properties props = loadProperties("P6Test.properties");
+        String url = props.getProperty("url");
         try {
-            // we are going to use a testspy.forms file for these tests
-            List forms = getDefaultSpyForms();
-            writeFile("testspy.forms", forms);
-
-            // we are going to use the reloadtest.properties file for all tests
-            // this is a scratch file that won't hurt spy.properties
-            Map tp = getDefaultPropertyFile();
-            reloadProperty(tp);
-            Properties props = loadProperties(P6_TEST_PROPERTIES);
-            String drivername = props.getProperty("p6driver");
-            String user = props.getProperty("user");
-            String password = props.getProperty("password");
-            String url = props.getProperty("url");
-
-            P6Util.forName(drivername);
-            Driver driver = DriverManager.getDriver(url);
-            System.err.println("FRAMEWORK USING DRIVER == " + driver.getClass().getName() + " FOR URL " + url);
-            connection = DriverManager.getConnection(url, user, password);
-
-            printAllDrivers();
+            Driver driver;
+            if ( url != null && url.length() > 0) {
+                while ((driver = DriverManager.getDriver(url)) != null) {
+                    System.err.println("Deregistering driver: "+driver.getClass().getName());
+                    DriverManager.deregisterDriver(driver);
+                }
+            }
         } catch (Exception e) {
-            fail(e.getMessage()+" check the properties in "+ P6_TEST_PROPERTIES);
         }
     }
 

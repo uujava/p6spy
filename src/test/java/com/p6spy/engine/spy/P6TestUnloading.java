@@ -73,21 +73,21 @@ public class P6TestUnloading extends P6TestFramework {
     @Override
     public void setUp() {
         /*
-         * try { //P6TestUtil.unloadDrivers(); } catch (SQLException e)
+         * try { //P6TestFramework.unloadDrivers(); } catch (SQLException e)
          * {com.p6spy.engine.spy.P6SpyDriver fail("could not init"); }
          */
     }
 
     public void testDriverUnloading() throws Exception {
-        Properties props = P6TestUtil.loadProperties("P6Test.properties");
+        Properties props = loadProperties("P6Test.properties");
         String url = props.getProperty("url");
         String user = props.getProperty("user");
         String password = props.getProperty("password");
         String p6Driver = props.getProperty("p6driver");
 
         unloadAll();
-        Map properties = P6TestUtil.getDefaultPropertyFile();
-        P6TestUtil.reloadProperty(properties);
+        Map properties = getDefaultPropertyFile();
+        reloadProperty(properties);
 //            registerDriver(oracleDriver);
         //P6Util.forName(oracleDriver);
         Connection con = DriverManager.getConnection(url, user, password);

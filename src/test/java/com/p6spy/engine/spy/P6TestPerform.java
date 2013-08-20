@@ -117,7 +117,7 @@ public class P6TestPerform extends P6TestFramework {
     }
 
     @Override
-    protected void setUp() {
+    protected void setUp() throws Exception {
         super.setUp();
     }
 

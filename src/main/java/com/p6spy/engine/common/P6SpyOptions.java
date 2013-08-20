@@ -76,227 +76,231 @@ public class P6SpyOptions extends P6Options {
      * and have reload properties = true, the expected overhead is minimal
      */
 
-    protected static Thread reloadThread;
+    public static final P6SpyOptions INSTANCE = new P6SpyOptions();
 
-    protected static OptionReloader reloader;
+    protected Thread reloadThread;
 
-
-    public static final String DRIVER_PREFIX = "realdriver";
-
-    public static final String MODULE_PREFIX = "module.";
-
-    public static final String DEFAULT_DB_DATEFORMAT = "dd-MMM-yy";
-
-    private static List modules;
-
-    private static List<String> driverNames;
-
-    private static boolean usePrefix;
-
-    private static boolean autoflush;
-
-    private static String exclude;
-
-    private static boolean filter;
-
-    private static String include;
-
-    private static String logfile;
-
-    private static String appender;
-
-    private static String realdriver;
-
-    private static String realdriver2;
-
-    private static String realdriver3;
-
-    private static String spydriver;
-
-    private static boolean append;
-
-    private static boolean deregister;
-
-    private static String dateformat;
+    protected OptionReloader reloader;
 
 
-    private static String includecategories;
+    public final String DRIVER_PREFIX = "realdriver";
 
-    private static String excludecategories;
+    public final String MODULE_PREFIX = "module.";
 
-    private static String sqlExpression;
+    public final String DEFAULT_DB_DATEFORMAT = "dd-MMM-yy";
 
-    private static boolean stackTrace;
+    private List modules;
 
-    private static String stackTraceClass;
+    private List<String> driverNames;
 
-    private static boolean reloadProperties;
+    private boolean usePrefix;
 
-    private static long reloadPropertiesInterval;
+    private boolean autoflush;
 
-    private static long reloadMs;
+    private String exclude;
 
-    private static String jndicontextfactory;
+    private boolean filter;
 
-    private static String jndicontextproviderurl;
+    private String include;
 
-    private static String jndicontextcustom;
+    private String logfile;
 
-    private static String realdatasource;
+    private String appender;
 
-    private static String realdatasourceclass;
+    private String realdriver;
 
-    private static String realdatasourceproperties;
+    private String realdriver2;
 
-    private static long executionThreshold;
+    private String realdriver3;
 
-    private static String databaseDialectDateFormat;
+    private String spydriver;
 
-    public P6SpyOptions() {
+    private boolean append;
+
+    private boolean deregister;
+
+    private String dateformat;
+
+
+    private String includecategories;
+
+    private String excludecategories;
+
+    private String sqlExpression;
+
+    private boolean stackTrace;
+
+    private String stackTraceClass;
+
+    private boolean reloadProperties;
+
+    private long reloadPropertiesInterval;
+
+    private long reloadMs;
+
+    private String jndicontextfactory;
+
+    private String jndicontextproviderurl;
+
+    private String jndicontextcustom;
+
+    private String realdatasource;
+
+    private String realdatasourceclass;
+
+    private String realdatasourceproperties;
+
+    private long executionThreshold;
+
+    private String databaseDialectDateFormat;
+
+    private P6SpyOptions() {
+        
     }
-    public static void setExecutionThreshold(String _executionThreshold) {
+    
+    public void setExecutionThreshold(String _executionThreshold) {
         executionThreshold = P6Util.parseLong(_executionThreshold, 0);
     }
 
-    public static long getExecutionThreshold() {
+    public long getExecutionThreshold() {
         return executionThreshold;
     }
 
-    public static void setUsePrefix(String _usePrefix) {
+    public void setUsePrefix(String _usePrefix) {
         usePrefix = P6Util.isTrue(_usePrefix, false);
     }
 
-    public static boolean getUsePrefix() {
+    public boolean getUsePrefix() {
         return usePrefix;
     }
 
-    public static void setAutoflush(String _autoflush) {
+    public void setAutoflush(String _autoflush) {
         autoflush = P6Util.isTrue(_autoflush, false);
     }
 
-    public static boolean getAutoflush() {
+    public boolean getAutoflush() {
         return autoflush;
     }
 
-    public static void setExclude(String _exclude) {
+    public void setExclude(String _exclude) {
         exclude = _exclude;
     }
 
-    public static String getExclude() {
+    public String getExclude() {
         return exclude;
     }
 
-    public static void setExcludecategories(String _excludecategories) {
+    public void setExcludecategories(String _excludecategories) {
         excludecategories = _excludecategories;
     }
 
-    public static String getExcludecategories() {
+    public String getExcludecategories() {
         return excludecategories;
     }
 
-    public static void setFilter(String _filter) {
+    public void setFilter(String _filter) {
         filter = P6Util.isTrue(_filter, false);
     }
 
-    public static boolean getFilter() {
+    public boolean getFilter() {
         return filter;
     }
 
-    public static void setInclude(String _include) {
+    public void setInclude(String _include) {
         include = _include;
     }
 
-    public static String getInclude() {
+    public String getInclude() {
         return include;
     }
 
-    public static void setIncludecategories(String _includecategories) {
+    public void setIncludecategories(String _includecategories) {
         includecategories = _includecategories;
     }
 
-    public static String getIncludecategories() {
+    public String getIncludecategories() {
         return includecategories;
     }
 
-    public static boolean getDeregisterDrivers() {
+    public boolean getDeregisterDrivers() {
         return deregister;
     }
 
-    public static void setDeregisterDrivers(String trueOrFalse) {
+    public void setDeregisterDrivers(String trueOrFalse) {
         deregister = P6Util.isTrue(trueOrFalse, false);
     }
 
-    public static void setLogfile(String _logfile) {
+    public void setLogfile(String _logfile) {
         logfile = _logfile;
         if (logfile == null) {
             logfile = "spy.log";
         }
     }
 
-    public static String getLogfile() {
+    public String getLogfile() {
         return logfile;
     }
 
-    public static String getAppender() {
+    public String getAppender() {
         return appender;
     }
 
-    public static void setAppender(String className) {
+    public void setAppender(String className) {
         appender = className;
     }
 
-    public static void setRealdriver(String _realdriver) {
+    public void setRealdriver(String _realdriver) {
         realdriver = _realdriver;
     }
 
-    public static String getRealdriver() {
+    public String getRealdriver() {
         return realdriver;
     }
 
-    public static void setRealdriver2(String _realdriver2) {
+    public void setRealdriver2(String _realdriver2) {
         realdriver2 = _realdriver2;
     }
 
-    public static String getRealdriver2() {
+    public String getRealdriver2() {
         return realdriver2;
     }
 
-    public static void setRealdriver3(String _realdriver3) {
+    public void setRealdriver3(String _realdriver3) {
         realdriver3 = _realdriver3;
     }
 
-    public static String getRealdriver3() {
+    public String getRealdriver3() {
         return realdriver3;
     }
 
-    public static void setAppend(String _append) {
+    public void setAppend(String _append) {
         append = P6Util.isTrue(_append, true);
     }
 
-    public static boolean getAppend() {
+    public boolean getAppend() {
         return append;
     }
 
-    public static void setSpydriver(String _spydriver) {
+    public void setSpydriver(String _spydriver) {
         spydriver = _spydriver;
         if (spydriver == null) {
             spydriver = "com.p6spy.engine.spy.P6SpyDriver";
         }
     }
 
-    public static String getSpydriver() {
+    public String getSpydriver() {
         return spydriver;
     }
 
-    public static void setDateformat(String _dateformat) {
+    public void setDateformat(String _dateformat) {
         dateformat = _dateformat;
     }
 
-    public static String getDateformat() {
+    public String getDateformat() {
         return dateformat;
     }
 
-    public static SimpleDateFormat getDateformatter() {
+    public SimpleDateFormat getDateformatter() {
         if (dateformat == null || dateformat.equals("")) {
             return null;
         } else {
@@ -304,95 +308,95 @@ public class P6SpyOptions extends P6Options {
         }
     }
 
-    public static boolean getStackTrace() {
+    public boolean getStackTrace() {
         return stackTrace;
     }
 
-    public static void setStackTrace(String _stacktrace) {
+    public void setStackTrace(String _stacktrace) {
         stackTrace = P6Util.isTrue(_stacktrace, false);
     }
 
-    public static String getStackTraceClass() {
+    public String getStackTraceClass() {
         return stackTraceClass;
     }
 
-    public static void setStackTraceClass(String stacktraceclass) {
+    public void setStackTraceClass(String stacktraceclass) {
         stackTraceClass = stacktraceclass;
     }
 
-    public static String getSQLExpression() {
+    public String getSQLExpression() {
         return sqlExpression;
     }
 
-    public static void setSQLExpression(String sqlexpression) {
+    public void setSQLExpression(String sqlexpression) {
         if (sqlexpression != null && sqlexpression.equals("")) {
             sqlexpression = null;
         }
         sqlExpression = sqlexpression;
     }
 
-    public static boolean getReloadProperties() {
+    public boolean getReloadProperties() {
         return reloadProperties;
     }
 
-    public static void setReloadProperties(String _reloadproperties) {
+    public void setReloadProperties(String _reloadproperties) {
         reloadProperties = P6Util.isTrue(_reloadproperties, false);
     }
 
-    public static long getReloadPropertiesInterval() {
+    public long getReloadPropertiesInterval() {
         return reloadPropertiesInterval;
     }
 
-    public static void setReloadPropertiesInterval(String _reloadpropertiesinterval) {
+    public void setReloadPropertiesInterval(String _reloadpropertiesinterval) {
         reloadPropertiesInterval = P6Util.parseLong(_reloadpropertiesinterval, -1l);
         reloadMs = reloadPropertiesInterval * 1000l;
     }
 
-    public static void setJNDIContextFactory(String _jndicontextfactory) {
+    public void setJNDIContextFactory(String _jndicontextfactory) {
         jndicontextfactory = _jndicontextfactory;
     }
 
-    public static String getJNDIContextFactory() {
+    public String getJNDIContextFactory() {
         return jndicontextfactory;
     }
 
-    public static void setJNDIContextProviderURL(String _jndicontextproviderurl) {
+    public void setJNDIContextProviderURL(String _jndicontextproviderurl) {
         jndicontextproviderurl = _jndicontextproviderurl;
     }
 
-    public static String getJNDIContextProviderURL() {
+    public String getJNDIContextProviderURL() {
         return jndicontextproviderurl;
     }
 
-    public static void setJNDIContextCustom(String _jndicontextcustom) {
+    public void setJNDIContextCustom(String _jndicontextcustom) {
         jndicontextcustom = _jndicontextcustom;
     }
 
-    public static String getJNDIContextCustom() {
+    public String getJNDIContextCustom() {
         return jndicontextcustom;
     }
 
-    public static void setRealDataSource(String _realdatasource) {
+    public void setRealDataSource(String _realdatasource) {
         realdatasource = _realdatasource;
     }
 
-    public static String getRealDataSource() {
+    public String getRealDataSource() {
         return realdatasource;
     }
 
-    public static void setRealDataSourceClass(String _realdatasourceclass) {
+    public void setRealDataSourceClass(String _realdatasourceclass) {
         realdatasourceclass = _realdatasourceclass;
     }
 
-    public static String getRealDataSourceClass() {
+    public String getRealDataSourceClass() {
         return realdatasourceclass;
     }
 
-    public static void setRealDataSourceProperties(String _realdatasourceproperties) {
+    public void setRealDataSourceProperties(String _realdatasourceproperties) {
         realdatasourceproperties = _realdatasourceproperties;
     }
 
-    public static String getRealDataSourceProperties() {
+    public String getRealDataSourceProperties() {
         return realdatasourceproperties;
     }
 
@@ -409,7 +413,7 @@ public class P6SpyOptions extends P6Options {
         P6LogQuery.info("reloadProperties() successful");
     }
 
-    protected static void configureReloadingThread() {
+    protected void configureReloadingThread() {
         if (reloadProperties) {
             // check to see if the thread is running.  If so,
             // then change the sleep factor. if not, then
@@ -435,11 +439,11 @@ public class P6SpyOptions extends P6Options {
 
     // this should actually be getAllModules but to make it easier for others to add
     // methods we'll just use allMethods
-    public static List allModules() {
+    public List allModules() {
         return modules;
     }
 
-    public static List<String> allDriverNames() {
+    public List<String> allDriverNames() {
         return driverNames;
     }
 
@@ -448,7 +452,7 @@ public class P6SpyOptions extends P6Options {
      *
      * @return String
      */
-    public static String getDatabaseDialectDateFormat() {
+    public String getDatabaseDialectDateFormat() {
         return databaseDialectDateFormat;
     }
 
@@ -457,7 +461,7 @@ public class P6SpyOptions extends P6Options {
      *
      * @param _databaseDialectDateFormat The databaseDialectDateFormat to set
      */
-    public static void setDatabaseDialectDateFormat(String _databaseDialectDateFormat) {
+    public void setDatabaseDialectDateFormat(String _databaseDialectDateFormat) {
         databaseDialectDateFormat = _databaseDialectDateFormat;
         if (_databaseDialectDateFormat == null || _databaseDialectDateFormat.length() == 0) {
             databaseDialectDateFormat = DEFAULT_DB_DATEFORMAT;

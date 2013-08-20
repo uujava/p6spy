@@ -116,7 +116,9 @@
 package com.p6spy.engine.spy;
 
 import junit.framework.*;
+
 import java.sql.*;
+
 import com.p6spy.engine.common.*;
 
 public class P6TestStatement extends P6TestFramework {
@@ -133,16 +135,11 @@ public class P6TestStatement extends P6TestFramework {
         TestSuite suite = new TestSuite(P6TestStatement.class);
         return suite;
     }
-    
-    protected void setUp() {
+        
+    protected void setUp() throws Exception {
         super.setUp();
-        try {
-            Statement statement = getStatement("drop table stmt_test");
-            drop(statement);
-            statement.execute("create table stmt_test (col1 varchar2(255), col2 number(5))");
-        } catch (Exception e) {
-            fail(e.getMessage()+" due to error: "+getStackTrace(e));
-        }
+        PreparedStatement statement = getStatement("create table stmt_test (col1 varchar(255), col2 int)");
+        statement.executeUpdate();
     }
     
     public void testQueryUpdate() {
@@ -202,7 +199,7 @@ public class P6TestStatement extends P6TestFramework {
             assertTrue(P6LogQuery.getLastEntry().indexOf(update) != -1);
             
             // set the execution threshold very low
-            P6SpyOptions.setExecutionThreshold("0");
+            P6SpyOptions.INSTANCE.setExecutionThreshold("0");
             
             // test a basic select
             String query = "select count(*) from stmt_test";
@@ -214,7 +211,7 @@ public class P6TestStatement extends P6TestFramework {
             rs.close();
             
             // now increase the execution threshold and make sure the query is not captured
-            P6SpyOptions.setExecutionThreshold("10000");
+            P6SpyOptions.INSTANCE.setExecutionThreshold("10000");
             
             // test a basic select
             String nextQuery = "select count(1) from stmt_test where 1 = 2";
@@ -228,7 +225,7 @@ public class P6TestStatement extends P6TestFramework {
             assertEquals(0, rs.getInt(1));
             rs.close();
             
-            P6SpyOptions.setExecutionThreshold("0");
+            P6SpyOptions.INSTANCE.setExecutionThreshold("0");
             
             // finally, just make sure it now works as expected
             rs = statement.executeQuery(nextQuery);
@@ -242,30 +239,20 @@ public class P6TestStatement extends P6TestFramework {
         }
     }
     
-    protected void tearDown() {
-        try {
-            super.tearDown();
-            Statement statement = getStatement("drop table stmt_test");
-            drop(statement);
-        }  catch (Exception e) {
-            fail(e.getMessage());
-        }
+    protected void tearDown() throws Exception {
+        PreparedStatement statement = getStatement("drop table stmt_test");
+        statement.executeUpdate();
     }
     
-    protected void drop(Statement statement) {
-        if (statement == null) { return; }
-        dropStatement("drop table stmt_test", statement);
-    }
-    
-    protected void dropStatement(String sql, Statement statement) {
+    protected void dropStatement(String sql, PreparedStatement statement) {
         try {
-            statement.execute(sql);
+            statement.executeUpdate();
         } catch (Exception e) {
             // we don't really care about cleanup failing
         }
     }
     
-    protected Statement getStatement(String query) throws SQLException {
-        return (connection.createStatement());
+    protected PreparedStatement getStatement(String query) throws SQLException {
+        return connection.prepareStatement(query);
     }
 }

@@ -140,7 +140,7 @@ public class P6TestCommon extends P6TestFramework {
     }
 
     @Override
-    protected void setUp() {
+    protected void setUp() throws Exception {
         super.setUp();
         try {
             Statement statement = connection.createStatement();
@@ -156,7 +156,7 @@ public class P6TestCommon extends P6TestFramework {
         try {
 
             // first should match
-            P6SpyOptions.setFilter("true");
+            P6SpyOptions.INSTANCE.setFilter("true");
             P6LogQuery.setExcludeTables("");
             P6LogQuery.setIncludeTables("");
             Statement statement = connection.createStatement();
@@ -165,7 +165,7 @@ public class P6TestCommon extends P6TestFramework {
             assertTrue(P6LogQuery.getLastEntry().indexOf(query) != -1);
 
             // now it should fail due to filter = false
-            P6SpyOptions.setFilter("false");
+            P6SpyOptions.INSTANCE.setFilter("false");
             P6LogQuery.setExcludeTables("");
             P6LogQuery.setIncludeTables("");
             query = "select 'w' from stmt_test";
@@ -173,7 +173,7 @@ public class P6TestCommon extends P6TestFramework {
             assertTrue(P6LogQuery.getLastEntry().indexOf(query) != -1);
 
             // now match should still fail because table is excluded
-            P6SpyOptions.setFilter("true");
+            P6SpyOptions.INSTANCE.setFilter("true");
             P6LogQuery.setExcludeTables("stmt_test");
             P6LogQuery.setIncludeTables("");
             query = "select 'x' from stmt_test";
@@ -190,7 +190,7 @@ public class P6TestCommon extends P6TestFramework {
         Statement statement = connection.createStatement();
 
         // should match (basic)
-        P6SpyOptions.setFilter("true");
+        P6SpyOptions.INSTANCE.setFilter("true");
         P6LogQuery.setExcludeTables("");
         P6LogQuery.setIncludeTables("");
         String query = "select 'y' from stmt_test";
@@ -198,7 +198,7 @@ public class P6TestCommon extends P6TestFramework {
         assertTrue(P6LogQuery.getLastEntry().indexOf(query) != -1);
 
         // now match should match (test regex)
-        P6SpyOptions.setFilter("true");
+        P6SpyOptions.INSTANCE.setFilter("true");
         P6LogQuery.setExcludeTables("[a-z]tmt_test");
         P6LogQuery.setIncludeTables("");
         query = "select 'x' from stmt_test";
@@ -206,7 +206,7 @@ public class P6TestCommon extends P6TestFramework {
         assertTrue(P6LogQuery.getLastEntry().indexOf(query) == -1);
 
         // now match should fail (test regex again)
-        P6SpyOptions.setFilter("true");
+        P6SpyOptions.INSTANCE.setFilter("true");
         P6LogQuery.setExcludeTables("[0-9]tmt_test");
         P6LogQuery.setIncludeTables("");
         query = "select 'z' from stmt_test";
@@ -219,7 +219,7 @@ public class P6TestCommon extends P6TestFramework {
         Statement statement = connection.createStatement();
 
         // test rollback logging
-        P6SpyOptions.setFilter("true");
+        P6SpyOptions.INSTANCE.setFilter("true");
         P6LogQuery.setExcludeTables("");
         P6LogQuery.setIncludeTables("");
         P6LogQuery.setExcludeCategories("");
@@ -231,7 +231,7 @@ public class P6TestCommon extends P6TestFramework {
         assertTrue(P6LogQuery.getLastEntry().indexOf("rollback") != -1);
 
         // test commit logging
-        P6SpyOptions.setFilter("true");
+        P6SpyOptions.INSTANCE.setFilter("true");
         P6LogQuery.setExcludeTables("");
         P6LogQuery.setIncludeTables("");
         P6LogQuery.setExcludeCategories("");
@@ -243,7 +243,7 @@ public class P6TestCommon extends P6TestFramework {
         assertTrue(P6LogQuery.getLastEntry().indexOf("commit") != -1);
 
         // test debug logging
-        P6SpyOptions.setFilter("true");
+        P6SpyOptions.INSTANCE.setFilter("true");
         P6LogQuery.setExcludeTables("stmt_test");
         P6LogQuery.setIncludeTables("");
         P6LogQuery.setExcludeCategories("");
@@ -258,10 +258,10 @@ public class P6TestCommon extends P6TestFramework {
         try {
             // get a statement
             Statement statement = connection.createStatement();
-            P6SpyOptions.setStackTrace("true");
+            P6SpyOptions.INSTANCE.setStackTrace("true");
 
             // perform a query & make sure we get the stack trace
-            P6SpyOptions.setFilter("true");
+            P6SpyOptions.INSTANCE.setFilter("true");
             P6LogQuery.setExcludeTables("");
             P6LogQuery.setIncludeTables("");
             String query = "select 'y' from stmt_test";
@@ -271,8 +271,8 @@ public class P6TestCommon extends P6TestFramework {
 
             // filter on stack trace that will not match
             P6LogQuery.clearLastStack();
-            P6SpyOptions.setStackTraceClass("com.dont.match");
-            P6SpyOptions.setFilter("true");
+            P6SpyOptions.INSTANCE.setStackTraceClass("com.dont.match");
+            P6SpyOptions.INSTANCE.setFilter("true");
             P6LogQuery.setExcludeTables("");
             P6LogQuery.setIncludeTables("");
             query = "select 'a' from stmt_test";
@@ -282,8 +282,8 @@ public class P6TestCommon extends P6TestFramework {
             assertNull(P6LogQuery.getLastStack());
 
             P6LogQuery.clearLastStack();
-            P6SpyOptions.setStackTraceClass("com.p6spy");
-            P6SpyOptions.setFilter("true");
+            P6SpyOptions.INSTANCE.setStackTraceClass("com.p6spy");
+            P6SpyOptions.INSTANCE.setFilter("true");
             P6LogQuery.setExcludeTables("");
             P6LogQuery.setIncludeTables("");
             query = "select 'b' from stmt_test";
@@ -305,7 +305,7 @@ public class P6TestCommon extends P6TestFramework {
         String query = "select 'b' from stmt_test";
         statement.executeQuery(query);
 
-        assertEquals(P6SpyOptions.getFilter(), false);
+        assertEquals(P6SpyOptions.INSTANCE.getFilter(), false);
 
         tp.put("filter","true");
         tp.put("include","bob");
@@ -332,19 +332,19 @@ public class P6TestCommon extends P6TestFramework {
         Thread.sleep(2000);
         query = "select 'c' from stmt_test";
         statement.executeQuery(query);
-        assertEquals(P6SpyOptions.getFilter(), true);
-        assertEquals(P6SpyOptions.getInclude(), "bob");
-        assertEquals(P6SpyOptions.getExclude(), "barb");
-        assertEquals(P6SpyOptions.getAutoflush(), false);
-        assertEquals(P6SpyOptions.getLogfile(), "reload.log");
-        assertEquals(P6SpyOptions.getAppend(), false);
-        assertEquals(P6SpyOptions.getDateformat(), "dd-MM-yyyy");
-        assertEquals(P6SpyOptions.getIncludecategories(), "debug");
-        assertEquals(P6SpyOptions.getExcludecategories(), "result,batch");
-        assertEquals(P6SpyOptions.getStackTrace(), true);
-        assertEquals(P6SpyOptions.getStackTraceClass(), "dummy");
-        assertEquals(P6SpyOptions.getReloadProperties(), true);
-        assertEquals(P6SpyOptions.getReloadPropertiesInterval(), 1);
+        assertEquals(P6SpyOptions.INSTANCE.getFilter(), true);
+        assertEquals(P6SpyOptions.INSTANCE.getInclude(), "bob");
+        assertEquals(P6SpyOptions.INSTANCE.getExclude(), "barb");
+        assertEquals(P6SpyOptions.INSTANCE.getAutoflush(), false);
+        assertEquals(P6SpyOptions.INSTANCE.getLogfile(), "reload.log");
+        assertEquals(P6SpyOptions.INSTANCE.getAppend(), false);
+        assertEquals(P6SpyOptions.INSTANCE.getDateformat(), "dd-MM-yyyy");
+        assertEquals(P6SpyOptions.INSTANCE.getIncludecategories(), "debug");
+        assertEquals(P6SpyOptions.INSTANCE.getExcludecategories(), "result,batch");
+        assertEquals(P6SpyOptions.INSTANCE.getStackTrace(), true);
+        assertEquals(P6SpyOptions.INSTANCE.getStackTraceClass(), "dummy");
+        assertEquals(P6SpyOptions.INSTANCE.getReloadProperties(), true);
+        assertEquals(P6SpyOptions.INSTANCE.getReloadPropertiesInterval(), 1);
     }
 
     public void testMultiDriver() {

@@ -71,7 +71,7 @@ public class FileLogger extends StdoutLogger {
 
     public void setLogfile(String fileName) {
 	try {
-	    qlog = new PrintStream(new FileOutputStream(fileName, P6SpyOptions.getAppend()));
+	    qlog = new PrintStream(new FileOutputStream(fileName, P6SpyOptions.INSTANCE.getAppend()));
 	} catch (IOException e) {
 	    e.printStackTrace(System.err);
 	}

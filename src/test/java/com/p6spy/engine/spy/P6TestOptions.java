@@ -62,54 +62,58 @@
 package com.p6spy.engine.spy;
 
 
-import com.p6spy.engine.common.*;
+import com.p6spy.engine.common.OptionReloader;
+import com.p6spy.engine.common.P6SpyOptions;
+import com.p6spy.engine.common.P6SpyProperties;
 
 public class P6TestOptions extends P6TestFramework {
 
-    public P6TestOptions(String name) {
-	super(name);
+    public P6TestOptions(String testName) {
+        super(testName);
     }
-    
+
     public void testSavingOptions() {
-	// should go back and refactor all that
-	// kludgy nonsense we do with all the "reloadProperties"
-	//
-	// anyway.  At this point, I know I've got a file
-	// called PROPERTY_FILE written out.  I'm going
-	// to test a property value, set it, save it, 
-	// reload, test it, change it, reload it.  Got that?
-
-	// some hilarious driver names here
-	String muleDriver  = "Borax";
-	String remDriver   = "Driver 8";
-
-	chkDriver(muleDriver, false);
-	P6SpyOptions.setRealdriver3(muleDriver);
-	chkDriver(muleDriver, true);
-
-	P6SpyProperties.saveProperties();
-	chkDriver(muleDriver, true);
-
-	P6SpyOptions.setRealdriver3(remDriver);
-	chkDriver(remDriver, true);
-
-	// now reload that saved goodness and we'll should see
-	// the muleDriver pop backup
-	OptionReloader.reload();
-	chkDriver(muleDriver, true);
-
-	// clean up the file, just in case
-	P6SpyOptions.setRealdriver3("");
-	P6SpyProperties.saveProperties();
+    	// should go back and refactor all that
+    	// kludgy nonsense we do with all the "reloadProperties"
+    	//
+    	// anyway.  At this point, I know I've got a file
+    	// called PROPERTY_FILE written out.  I'm going
+    	// to test a property value, set it, save it, 
+    	// reload, test it, change it, reload it.  Got that?
+    
+    	// some hilarious driver names here
+    	String muleDriver  = "Borax";
+    	String remDriver   = "Driver 8";
+    
+    	chkDriver(muleDriver, false);
+    	P6SpyOptions.INSTANCE.setRealdriver3(muleDriver);
+    	chkDriver(muleDriver, true);
+    
+    	P6SpyProperties.saveProperties();
+    	chkDriver(muleDriver, true);
+    
+    	P6SpyOptions.INSTANCE.setRealdriver3(remDriver);
+    	chkDriver(remDriver, true);
+    
+    	// now reload that saved goodness and we'll should see
+    	// the muleDriver pop backup
+    	OptionReloader.reload();
+    	chkDriver(muleDriver, true);
     }
 
     protected void chkDriver(String expected, boolean equals) {
-	String actual = P6SpyOptions.getRealdriver3();
-	if (equals) {
-	    assertTrue("expected a driver 3 of '" + expected + "' but found '" + actual + "'", expected.compareTo(actual) == 0);
-	} else {
-	    assertTrue("expected a driver 3 to not be '" + expected + "' but it was'" + actual + "'", (actual == null) || (expected.compareTo(actual) != 0));
-	}
-
+    	String actual = P6SpyOptions.INSTANCE.getRealdriver3();
+    	if (equals) {
+    	    assertEquals(expected, actual);
+    	} else {
+    	    assertTrue("expected a driver 3 to not be '" + expected + "' but it was'" + actual + "'", (actual == null) || (expected.compareTo(actual) != 0));
+    	}
+    }
+    
+    @Override
+    protected void tearDown() throws Exception {
+        // clean up the file, just in case
+        P6SpyOptions.INSTANCE.setRealdriver3("");
+        P6SpyProperties.saveProperties();
     }
 }

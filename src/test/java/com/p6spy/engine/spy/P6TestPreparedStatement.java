@@ -90,6 +90,7 @@
 package com.p6spy.engine.spy;
 
 import junit.framework.*;
+
 import java.sql.*;
 
 public class P6TestPreparedStatement extends P6TestStatement {
@@ -108,15 +109,9 @@ public class P6TestPreparedStatement extends P6TestStatement {
     }
 
     @Override
-    protected void setUp() {
+    protected void setUp() throws Exception {
         super.setUp();
-        try {
-            Statement statement = connection.createStatement();
-            dropPrepared(statement);
-            statement.execute("create table prepstmt_test (col1 varchar2(255), col2 number(5))");
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }
+        getPreparedStatement("create table prepstmt_test (col1 varchar(255), col2 int)").executeUpdate();
     }
 
     public void testPreparedQueryUpdate() {
@@ -181,15 +176,8 @@ public class P6TestPreparedStatement extends P6TestStatement {
     }
 
     @Override
-    protected void tearDown() {
-        try {
-            super.tearDown();
-            Statement statement = connection.createStatement();
-            dropPrepared(statement);
-        }  catch (Exception e) {
-            fail(e.getMessage());
-        }
-        super.tearDown();
+    protected void tearDown() throws Exception {
+        getPreparedStatement("drop table prepstmt_test");
     }
 
     protected void dropPrepared(Statement statement) {
@@ -205,11 +193,6 @@ public class P6TestPreparedStatement extends P6TestStatement {
     }
 
     protected PreparedStatement getPreparedStatement(String query) throws SQLException {
-        return (connection.prepareStatement(query));
-    }
-
-    @Override
-    protected Statement getStatement(String query) throws SQLException {
         return (connection.prepareStatement(query));
     }
 }

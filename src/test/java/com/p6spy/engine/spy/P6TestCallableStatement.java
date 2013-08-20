@@ -88,25 +88,16 @@
 
 package com.p6spy.engine.spy;
 
-import junit.framework.*;
-import java.sql.*;
-import com.p6spy.engine.spy.P6CallableStatement;
+import java.sql.CallableStatement;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 public class P6TestCallableStatement extends P6TestPreparedStatement {
 
     public P6TestCallableStatement(java.lang.String testName) {
         super(testName);
     }
-
-    public static void main(java.lang.String[] args) {
-        junit.textui.TestRunner.run(suite());
-    }
-
-    public static Test suite() {
-        TestSuite suite = new TestSuite(P6TestCallableStatement.class);
-        return suite;
-    }
-
 
     public void testCallable () throws Exception {
        int bigParam = 1024;
@@ -166,7 +157,7 @@ public class P6TestCallableStatement extends P6TestPreparedStatement {
     }
 
     @Override
-    protected Statement getStatement(String query) throws SQLException {
+    protected PreparedStatement getStatement(String query) throws SQLException {
         return (connection.prepareCall(query));
     }
 
