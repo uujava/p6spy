@@ -41,6 +41,11 @@
             <name>patmoore</name>
             <email>patmoore@users.sourceforge.net</email>
         </developer>
+        <developer>
+            <id>Quinton McCombs</id>
+            <name>qmccombs</name>
+            <email>quinton.mccombs@gmail.com</email>
+        </developer>
     </developers>
     <licenses>
         <license>
@@ -50,7 +55,7 @@
         </license>
     </licenses>
     <scm>
-        <connection>scm:git:git@github.com:patmoore/p6spy.git</connection>
+        <connection>scm:git:https://github.com/p6spy/p6spy.git</connection>
     </scm>
     <!--
     <scm>
