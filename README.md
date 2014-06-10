@@ -22,4 +22,4 @@ Issue tracking: [View/Create issues](https://github.com/p6spy/p6spy/issues)
 [p6spy-it](https://github.com/p6spy/p6spy-it) - for integration testing with misc application servers   
 [p6spy-perf](https://github.com/p6spy/p6spy-perf) - for performance testing (using jmeter)   
 
-**Note: This is NOT a fork of the original project.  This is the new home of this project.**
+This version introduces balancer into proxyes
