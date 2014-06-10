@@ -72,7 +72,7 @@ public class P6SpyOptions extends StandardMBean implements P6SpyLoadableOptions 
       defaults.put(LOGFILE, "spy.log");
       defaults.put(APPEND, Boolean.TRUE.toString());
       defaults.put(APPENDER, FileLogger.class.getName());
-      defaults.put(MODULELIST, P6SpyFactory.class.getName() + ","+ P6LogFactory.class.getName());
+      defaults.put(MODULELIST, P6SpyFactory.class.getName());
       defaults.put(STACKTRACE, Boolean.FALSE.toString());
       defaults.put(AUTOFLUSH, Boolean.FALSE.toString());
       defaults.put(RELOADPROPERTIES, Boolean.FALSE.toString());
