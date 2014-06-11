@@ -19,33 +19,34 @@
  */
 package com.p6spy.engine.ha;
 
-import com.p6spy.engine.common.ConnectionInformation;
+import com.p6spy.engine.common.PersistentStatementInformation;
 import com.p6spy.engine.proxy.Delegate;
-import com.p6spy.engine.proxy.ProxyFactory;
 
 import java.lang.reflect.Method;
 import java.sql.Statement;
 
 /**
  * User: kataev
- * Date: 10.06.14
+ * Date: 11.06.14
  */
-public class P6HaConnectionCreateStatementDelegate implements Delegate {
+public class P6HaPreparedStatementSetParameterDelegate implements Delegate {
+    private final PersistentStatementInformation statementInformation;
 
-    private final ConnectionInformation connectionInformation;
-
-    public P6HaConnectionCreateStatementDelegate(ConnectionInformation connectionInformation) {
-        this.connectionInformation = connectionInformation;
+    public P6HaPreparedStatementSetParameterDelegate(PersistentStatementInformation statementInformation) {
+        this.statementInformation = statementInformation;
     }
 
     @Override
     public Object invoke(Object proxy, Object underlying, Method method, Object[] args) throws Throwable {
-        Statement statement = (Statement) method.invoke(underlying, args);
-        P6HaStatementInvocationHandler invocationHandler = new P6HaStatementInvocationHandler(statement, connectionInformation);
-        return ProxyFactory.createProxy(statement, invocationHandler);
-    }
-
-    protected ConnectionInformation getConnectionInformation() {
-        return connectionInformation;
+        // ignore calls to any methods defined on the Statement interface!
+        if (!Statement.class.equals(method.getDeclaringClass())) {
+            int position = (Integer) args[0];
+            Object value = null;
+            if (!method.getName().equals("setNull") && args.length > 1) {
+                value = args[1];
+            }
+            statementInformation.setParameterValue(position, value);
+        }
+        return method.invoke(underlying, args);
     }
 }

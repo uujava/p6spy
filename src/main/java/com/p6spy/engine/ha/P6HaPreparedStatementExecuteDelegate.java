@@ -19,33 +19,34 @@
  */
 package com.p6spy.engine.ha;
 
-import com.p6spy.engine.common.ConnectionInformation;
+import com.p6spy.engine.common.PersistentStatementInformation;
 import com.p6spy.engine.proxy.Delegate;
-import com.p6spy.engine.proxy.ProxyFactory;
 
 import java.lang.reflect.Method;
-import java.sql.Statement;
+import java.sql.ResultSet;
 
 /**
  * User: kataev
- * Date: 10.06.14
+ * Date: 11.06.14
  */
-public class P6HaConnectionCreateStatementDelegate implements Delegate {
+public class P6HaPreparedStatementExecuteDelegate implements Delegate {
 
-    private final ConnectionInformation connectionInformation;
+    private final PersistentStatementInformation statementInformation;
 
-    public P6HaConnectionCreateStatementDelegate(ConnectionInformation connectionInformation) {
-        this.connectionInformation = connectionInformation;
+    private final HaStatementExecuteListener executeListener;
+
+    public P6HaPreparedStatementExecuteDelegate(PersistentStatementInformation statementInformation) {
+        this.statementInformation = statementInformation;
+        this.executeListener = P6HaOptions.getActiveInstance().getDbExecuteListener();
     }
 
     @Override
     public Object invoke(Object proxy, Object underlying, Method method, Object[] args) throws Throwable {
-        Statement statement = (Statement) method.invoke(underlying, args);
-        P6HaStatementInvocationHandler invocationHandler = new P6HaStatementInvocationHandler(statement, connectionInformation);
-        return ProxyFactory.createProxy(statement, invocationHandler);
-    }
+        Object result = method.invoke(underlying, args);
 
-    protected ConnectionInformation getConnectionInformation() {
-        return connectionInformation;
+        if (result != null && !(result instanceof ResultSet)) {
+            executeListener.onExecute(statementInformation);
+        }
+        return result;
     }
 }

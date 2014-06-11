@@ -40,6 +40,10 @@ public class PersistentStatementInformation extends StatementInformation {
 
     private final ArrayList<StatementParameter> parameterValues = new ArrayList<StatementParameter>();
 
+    private ArrayList<ArrayList<StatementParameter>> batchParametersValues;
+
+    private boolean batch;
+
     static FSTConfiguration fstConfiguration = FSTConfiguration.createDefaultConfiguration();
 
     public PersistentStatementInformation(ConnectionInformation connectionInformation) {
@@ -51,12 +55,32 @@ public class PersistentStatementInformation extends StatementInformation {
 
         FSTObjectOutput out = fstConfiguration.getObjectOutput(stream);
         try {
-            out.writeObject(parameterValues, ArrayList.class);
+            out.writeObject(parameterValues, ArrayList.class, StatementParameter.class);
             out.flush();
             stream.close();
         } catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException("Cannot serialize statement parameters");
+        }
+
+        return stream.toByteArray();
+    }
+
+    public byte[] getSerializedBatchValues() {
+        if (batchParametersValues == null) {
+            throw new RuntimeException("Batch parameters not found");
+        }
+
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+
+        FSTObjectOutput out = fstConfiguration.getObjectOutput(stream);
+        try {
+            out.writeObject(batchParametersValues, ArrayList.class, StatementParameter.class);
+            out.flush();
+            stream.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException("Cannot serialize batch statement parameters");
         }
 
         return stream.toByteArray();
@@ -101,7 +125,25 @@ public class PersistentStatementInformation extends StatementInformation {
         }
     }
 
+    public void addBatch() {
+        batch = true;
+        if (batchParametersValues == null) {
+            batchParametersValues = new ArrayList<ArrayList<StatementParameter>>();
+        }
+
+        batchParametersValues.add(new ArrayList<StatementParameter>(parameterValues));
+        parameterValues.clear();
+    }
+
     public ArrayList<StatementParameter> getParameterValues() {
         return parameterValues;
+    }
+
+    public ArrayList<ArrayList<StatementParameter>> getBatchParametersValues() {
+        return batchParametersValues;
+    }
+
+    public boolean isBatch() {
+        return batch;
     }
 }
