@@ -19,6 +19,7 @@
  */
 package com.p6spy.engine.ha;
 
+import com.p6spy.engine.spy.P6ModuleManager;
 import com.p6spy.engine.spy.option.P6OptionsRepository;
 
 import javax.management.StandardMBean;
@@ -37,6 +38,8 @@ public class P6HaOptions extends StandardMBean implements P6HaLoadableOptions {
 
     private final P6OptionsRepository optionsRepository;
 
+    private static HaStatementExecuteListener dbExecuteListener;
+
     public static final Map<String, String> defaults;
 
     static {
@@ -51,6 +54,15 @@ public class P6HaOptions extends StandardMBean implements P6HaLoadableOptions {
     @Override
     public void load(Map<String, String> options) {
         setSQLExpression(options.get(SQLEXPRESSION));
+    }
+
+    /**
+     * Utility method, to make accessing options from app less verbose.
+     *
+     * @return active instance of the {@link P6HaLoadableOptions}
+     */
+    public static P6HaLoadableOptions getActiveInstance() {
+        return P6ModuleManager.getInstance().getOptions(P6HaOptions.class);
     }
 
     @Override
@@ -78,5 +90,13 @@ public class P6HaOptions extends StandardMBean implements P6HaLoadableOptions {
     public void unSetSQLExpression() {
         optionsRepository.setOrUnSet(String.class, SQLEXPRESSION, null, defaults.get(SQLEXPRESSION));
         optionsRepository.setOrUnSet(Pattern.class, SQLEXPRESSION_PATTERN, null, defaults.get(SQLEXPRESSION_PATTERN));
+    }
+
+    public HaStatementExecuteListener getDbExecuteListener() {
+        return dbExecuteListener;
+    }
+
+    public void setDbExecuteListener(HaStatementExecuteListener dbExecuteListener) {
+        P6HaOptions.dbExecuteListener = dbExecuteListener;
     }
 }

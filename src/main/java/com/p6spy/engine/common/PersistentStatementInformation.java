@@ -23,10 +23,12 @@ import de.ruedigermoeller.serialization.FSTConfiguration;
 import de.ruedigermoeller.serialization.FSTObjectOutput;
 
 import javax.sql.rowset.serial.SerialBlob;
+import javax.sql.rowset.serial.SerialClob;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
 import java.sql.Blob;
+import java.sql.Clob;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
@@ -67,23 +69,36 @@ public class PersistentStatementInformation extends StatementInformation {
      * @param value    the value of the parameter
      */
     public void setParameterValue(final int position, final Object value) {
-        Serializable parameterValue = null;
+        Serializable parameterValue;
 
         if (!(value instanceof Serializable)) {
-            if (value instanceof Blob) {
-                try {
-                    parameterValue = new SerialBlob((Blob) value);
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                    throw new IllegalArgumentException("Illegal Blob parameter " + e.getMessage());
-                }
-            } else {
-                // TODO look at more cases
-                throw new IllegalArgumentException("Non serializable parameter value");
-            }
+            parameterValue = trySerializable(value);
+        } else {
+            parameterValue = (Serializable) value;
         }
 
         parameterValues.add(new StatementParameter(position, parameterValue));
+    }
+
+    private Serializable trySerializable(final Object value) {
+        if (value instanceof Blob) {
+            try {
+                return new SerialBlob((Blob) value);
+            } catch (SQLException e) {
+                e.printStackTrace();
+                throw new IllegalArgumentException("Illegal Blob parameter " + e.getMessage());
+            }
+        } else if (value instanceof Clob) {
+            try {
+                return new SerialClob((Clob) value);
+            } catch (SQLException e) {
+                e.printStackTrace();
+                throw new IllegalArgumentException("Illegal Clob parameter " + e.getMessage());
+            }
+        } else {
+            // TODO look at more cases
+            throw new IllegalArgumentException("Non serializable parameter value " + value);
+        }
     }
 
     public ArrayList<StatementParameter> getParameterValues() {

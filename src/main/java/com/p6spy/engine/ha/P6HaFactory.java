@@ -33,8 +33,6 @@ import java.sql.SQLException;
  */
 public class P6HaFactory implements P6Factory {
 
-    public static final String SQLEXPRESSION = "sqlexpression";
-
     @Override
     public P6LoadableOptions getOptions(P6OptionsRepository optionsRepository) {
         return new P6HaOptions(optionsRepository);

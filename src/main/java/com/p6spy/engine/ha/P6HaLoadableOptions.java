@@ -26,4 +26,8 @@ import com.p6spy.engine.spy.P6LoadableOptions;
  * Date: 10.06.14
  */
 public interface P6HaLoadableOptions extends P6HaOptionsMBean, P6LoadableOptions {
+
+    void setDbExecuteListener(HaStatementExecuteListener dbExecuteListener);
+
+    HaStatementExecuteListener getDbExecuteListener();
 }
