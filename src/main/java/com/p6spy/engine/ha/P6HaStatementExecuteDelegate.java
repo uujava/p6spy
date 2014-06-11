@@ -46,7 +46,7 @@ public class P6HaStatementExecuteDelegate implements Delegate {
 
         Object result = method.invoke(underlying, args);
 
-        if (result != null && !(result instanceof ResultSet)) {
+        if (executeListener != null && result != null && !(result instanceof ResultSet)) {
             executeListener.onExecute(statementInformation);
         }
         return result;

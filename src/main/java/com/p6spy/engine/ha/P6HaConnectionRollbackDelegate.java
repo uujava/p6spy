@@ -32,13 +32,19 @@ public class P6HaConnectionRollbackDelegate implements Delegate {
 
     private final ConnectionInformation connectionInformation;
 
+    private final HaStatementExecuteListener executeListener;
+
     public P6HaConnectionRollbackDelegate(ConnectionInformation connectionInformation) {
         this.connectionInformation = connectionInformation;
+        this.executeListener = P6HaOptions.getActiveInstance().getDbExecuteListener();
     }
 
     @Override
     public Object invoke(Object proxy, Object underlying, Method method, Object[] args) throws Throwable {
-        // invoke original
-        return method.invoke(underlying, args);
+        Object res = method.invoke(underlying, args);
+        if (executeListener != null) {
+            executeListener.onRollback(connectionInformation);
+        }
+        return res;
     }
 }

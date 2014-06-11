@@ -44,7 +44,7 @@ public class P6HaPreparedStatementExecuteDelegate implements Delegate {
     public Object invoke(Object proxy, Object underlying, Method method, Object[] args) throws Throwable {
         Object result = method.invoke(underlying, args);
 
-        if (result != null && !(result instanceof ResultSet)) {
+        if (executeListener != null && result != null && !(result instanceof ResultSet)) {
             executeListener.onExecute(statementInformation);
         }
         return result;

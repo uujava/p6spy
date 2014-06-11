@@ -30,7 +30,7 @@ import java.util.EventListener;
  */
 public interface HaStatementExecuteListener extends EventListener {
 
-    void onAutoCommit(ConnectionInformation connectionInformation);
+    void onAutoCommit(ConnectionInformation connectionInformation, boolean value);
 
     void onExecute(PersistentStatementInformation statementInformation);
 
