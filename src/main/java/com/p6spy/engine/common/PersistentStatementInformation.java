@@ -45,6 +45,8 @@ public class PersistentStatementInformation extends StatementInformation {
 
     private boolean batch;
 
+    private Long id;
+
     static FSTConfiguration fstConfiguration = FSTConfiguration.createDefaultConfiguration();
 
     public PersistentStatementInformation(ConnectionInformation connectionInformation) {
@@ -146,6 +148,14 @@ public class PersistentStatementInformation extends StatementInformation {
 
     public boolean isBatch() {
         return batch;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     @SuppressWarnings("unchecked")
