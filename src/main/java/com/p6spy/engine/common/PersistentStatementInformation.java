@@ -169,4 +169,14 @@ public class PersistentStatementInformation extends StatementInformation {
             emptyStatement.parameterValues = (ArrayList<StatementParameter>) input.readObject(ArrayList.class, StatementParameter.class);
         }
     }
+
+    @Override
+    public String toString() {
+        return "PersistentStatementInformation{" +
+                "id=" + id +
+                ", connectionId=" + getConnectionId() +
+                ", sql=" + getSql() +
+                ", batch=" + batch +
+                '}';
+    }
 }
