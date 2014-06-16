@@ -20,6 +20,7 @@
 package com.p6spy.engine.common;
 
 import de.ruedigermoeller.serialization.FSTConfiguration;
+import de.ruedigermoeller.serialization.FSTObjectInput;
 import de.ruedigermoeller.serialization.FSTObjectOutput;
 
 import javax.sql.rowset.serial.SerialBlob;
@@ -38,7 +39,7 @@ import java.util.ArrayList;
  */
 public class PersistentStatementInformation extends StatementInformation {
 
-    private final ArrayList<StatementParameter> parameterValues = new ArrayList<StatementParameter>();
+    private ArrayList<StatementParameter> parameterValues = new ArrayList<StatementParameter>();
 
     private ArrayList<ArrayList<StatementParameter>> batchParametersValues;
 
@@ -145,5 +146,17 @@ public class PersistentStatementInformation extends StatementInformation {
 
     public boolean isBatch() {
         return batch;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static void fillParameters(PersistentStatementInformation emptyStatement, byte[] params, boolean batch) throws Exception {
+        FSTObjectInput input = fstConfiguration.getObjectInput(params);
+
+        if (batch) {
+            emptyStatement.batch = true;
+            emptyStatement.batchParametersValues = (ArrayList<ArrayList<StatementParameter>>) input.readObject(ArrayList.class, StatementParameter.class);
+        } else {
+            emptyStatement.parameterValues = (ArrayList<StatementParameter>) input.readObject(ArrayList.class, StatementParameter.class);
+        }
     }
 }
