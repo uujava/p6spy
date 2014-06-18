@@ -96,12 +96,14 @@ public class PersistentStatementInformation extends StatementInformation {
      * @param value    the value of the parameter
      */
     public void setParameterValue(final int position, final Object value) {
-        Serializable parameterValue;
+        Serializable parameterValue = null;
 
-        if (!(value instanceof Serializable)) {
-            parameterValue = trySerializable(value);
-        } else {
-            parameterValue = (Serializable) value;
+        if (value != null) {
+            if (!(value instanceof Serializable)) {
+                parameterValue = trySerializable(value);
+            } else {
+                parameterValue = (Serializable) value;
+            }
         }
 
         parameterValues.add(new StatementParameter(position, parameterValue));
