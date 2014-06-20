@@ -138,8 +138,10 @@ public class PersistentStatementInformation extends StatementInformation {
             batchParametersValues = new ArrayList<Map<Integer, Serializable>>();
         }
 
-        batchParametersValues.add(new HashMap<Integer, Serializable>(parameterValues));
-        parameterValues.clear();
+        if (!parameterValues.isEmpty()) {
+            batchParametersValues.add(new HashMap<Integer, Serializable>(parameterValues));
+            parameterValues.clear();
+        }
     }
 
     public Map<Integer, Serializable> getParameterValues() {

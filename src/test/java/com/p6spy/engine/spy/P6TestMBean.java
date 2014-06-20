@@ -26,6 +26,7 @@ import com.p6spy.engine.outage.P6OutageOptions;
 import com.p6spy.engine.test.BaseTestCase;
 import com.p6spy.engine.test.P6TestFramework;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import javax.management.JMException;
@@ -36,6 +37,7 @@ import java.util.Set;
 
 import static org.junit.Assert.*;
 
+@Ignore
 public class P6TestMBean extends BaseTestCase {
 
   public static final String COM_SUN_MANAGEMENT_JMXREMOTE_PORT = "com.sun.management.jmxremote.port";

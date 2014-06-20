@@ -29,12 +29,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.io.FileUtils;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.*;
 
 import com.p6spy.engine.common.P6LogQuery;
 import com.p6spy.engine.logging.Category;
@@ -54,6 +49,7 @@ import com.p6spy.engine.spy.appender.SingleLineFormat;
 import com.p6spy.engine.test.BaseTestCase;
 import com.p6spy.engine.test.P6TestFramework;
 
+@Ignore
 public class P6TestOptionDefaults extends BaseTestCase {
 
   public static final File LOG_FILE = new File("spy.log");

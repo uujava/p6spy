@@ -24,6 +24,7 @@ import java.sql.SQLException;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.p6spy.engine.logging.P6LogLoadableOptions;
@@ -33,6 +34,7 @@ import com.p6spy.engine.spy.P6SpyOptions;
 import com.p6spy.engine.test.BaseTestCase;
 import com.p6spy.engine.test.P6TestFramework;
 
+@Ignore
 public class P6TestOptionAPI extends BaseTestCase {
 
   @BeforeClass

@@ -21,6 +21,7 @@ package com.p6spy.engine.spy;
 
 import com.p6spy.engine.test.P6TestFramework;
 import org.apache.log4j.Logger;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -37,6 +38,7 @@ import java.util.List;
 import static org.junit.Assert.*;
 
 @RunWith(Parameterized.class)
+@Ignore
 public class P6TestCallableStatement extends P6TestFramework {
   private static final Logger log = Logger.getLogger(P6TestCallableStatement.class);
 

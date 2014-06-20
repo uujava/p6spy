@@ -30,6 +30,7 @@ import java.sql.Statement;
 import java.sql.Timestamp;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -39,6 +40,7 @@ import com.p6spy.engine.test.P6TestFramework;
 /**
  * @author Peter Butkovic
  */
+@Ignore
 @RunWith(Parameterized.class)
 public class LoggedSQLValidTest extends P6TestFramework {
 

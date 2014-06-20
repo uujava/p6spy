@@ -34,6 +34,7 @@ import org.apache.log4j.spi.LoggingEvent;
 import org.apache.log4j.xml.DOMConfigurator;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.p6spy.engine.common.P6LogQuery;
@@ -44,6 +45,7 @@ import com.p6spy.engine.spy.option.P6TestOptionDefaults;
 import com.p6spy.engine.test.BaseTestCase;
 import com.p6spy.engine.test.P6TestFramework;
 
+@Ignore
 public class Log4jLoggerTest extends BaseTestCase {
 
   private static final String SUFFIX_DEBUG = "DEBUG";

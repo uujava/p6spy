@@ -23,10 +23,7 @@ import com.p6spy.engine.logging.P6LogOptions;
 import com.p6spy.engine.proxy.ProxyFactory;
 import com.p6spy.engine.test.P6TestFramework;
 
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
@@ -39,6 +36,7 @@ import java.sql.Statement;
 import static org.junit.Assert.*;
 
 @RunWith(Parameterized.class)
+@Ignore
 public class P6TestPreparedStatement extends P6TestFramework {
 
   public P6TestPreparedStatement(String db) throws SQLException, IOException {

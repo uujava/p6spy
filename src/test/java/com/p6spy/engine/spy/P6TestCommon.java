@@ -29,6 +29,7 @@ import com.p6spy.engine.spy.option.SystemProperties;
 import com.p6spy.engine.test.P6TestFramework;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -41,6 +42,7 @@ import java.sql.Statement;
 import static org.junit.Assert.*;
 
 @RunWith(Parameterized.class)
+@Ignore
 public class P6TestCommon extends P6TestFramework {
 
   Statement statement = null;

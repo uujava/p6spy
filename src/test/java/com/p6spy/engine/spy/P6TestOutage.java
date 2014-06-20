@@ -23,6 +23,7 @@ import com.p6spy.engine.logging.Category;
 import com.p6spy.engine.test.P6TestFramework;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -35,6 +36,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 @RunWith(Parameterized.class)
+@Ignore
 public class P6TestOutage extends P6TestFramework {
 
   public P6TestOutage(String db) throws SQLException, IOException {
