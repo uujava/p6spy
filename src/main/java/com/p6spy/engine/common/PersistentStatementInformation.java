@@ -55,6 +55,16 @@ public class PersistentStatementInformation extends StatementInformation {
         super(connectionInformation);
     }
 
+    public PersistentStatementInformation(PersistentStatementInformation original) {
+        super(original.connectionInformation);
+        setStatementQuery(original.getStatementQuery());
+        parameterValues.putAll(original.getParameterValues());
+        if (original.isBatch()) {
+            batch = true;
+            batchParametersValues = new ArrayList<Map<Integer, Serializable>>(original.getBatchParametersValues());
+        }
+    }
+
     public byte[] getSerializedValues() {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
 

@@ -26,9 +26,9 @@ package com.p6spy.engine.common;
  */
 public class StatementInformation implements Loggable {
 
-  private final ConnectionInformation connectionInformation;
+  protected final ConnectionInformation connectionInformation;
   private String statementQuery;
-  
+
   public StatementInformation(final ConnectionInformation connectionInformation) {
     this.connectionInformation = connectionInformation;
   }
