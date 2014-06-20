@@ -32,6 +32,8 @@ import java.sql.Blob;
 import java.sql.Clob;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * User: kataev
@@ -39,9 +41,9 @@ import java.util.ArrayList;
  */
 public class PersistentStatementInformation extends StatementInformation {
 
-    private ArrayList<StatementParameter> parameterValues = new ArrayList<StatementParameter>();
+    private Map<Integer, Serializable> parameterValues = new HashMap<Integer, Serializable>();
 
-    private ArrayList<ArrayList<StatementParameter>> batchParametersValues;
+    private ArrayList<Map<Integer, Serializable>> batchParametersValues;
 
     private boolean batch;
 
@@ -58,7 +60,7 @@ public class PersistentStatementInformation extends StatementInformation {
 
         FSTObjectOutput out = fstConfiguration.getObjectOutput(stream);
         try {
-            out.writeObject(parameterValues, ArrayList.class, StatementParameter.class);
+            out.writeObject(parameterValues, HashMap.class, Integer.class, Serializable.class);
             out.flush();
             stream.close();
         } catch (IOException e) {
@@ -78,7 +80,7 @@ public class PersistentStatementInformation extends StatementInformation {
 
         FSTObjectOutput out = fstConfiguration.getObjectOutput(stream);
         try {
-            out.writeObject(batchParametersValues, ArrayList.class, StatementParameter.class);
+            out.writeObject(batchParametersValues, ArrayList.class, HashMap.class, Integer.class);
             out.flush();
             stream.close();
         } catch (IOException e) {
@@ -106,7 +108,7 @@ public class PersistentStatementInformation extends StatementInformation {
             }
         }
 
-        parameterValues.add(new StatementParameter(position, parameterValue));
+        parameterValues.put(position, parameterValue);
     }
 
     private Serializable trySerializable(final Object value) {
@@ -133,18 +135,18 @@ public class PersistentStatementInformation extends StatementInformation {
     public void addBatch() {
         batch = true;
         if (batchParametersValues == null) {
-            batchParametersValues = new ArrayList<ArrayList<StatementParameter>>();
+            batchParametersValues = new ArrayList<Map<Integer, Serializable>>();
         }
 
-        batchParametersValues.add(new ArrayList<StatementParameter>(parameterValues));
+        batchParametersValues.add(new HashMap<Integer, Serializable>(parameterValues));
         parameterValues.clear();
     }
 
-    public ArrayList<StatementParameter> getParameterValues() {
+    public Map<Integer, Serializable> getParameterValues() {
         return parameterValues;
     }
 
-    public ArrayList<ArrayList<StatementParameter>> getBatchParametersValues() {
+    public ArrayList<Map<Integer, Serializable>> getBatchParametersValues() {
         return batchParametersValues;
     }
 
@@ -160,15 +162,22 @@ public class PersistentStatementInformation extends StatementInformation {
         this.id = id;
     }
 
+    public void clearParameters() {
+        parameterValues.clear();
+        if (batchParametersValues != null) {
+            batchParametersValues.clear();
+        }
+    }
+
     @SuppressWarnings("unchecked")
     public static void fillParameters(PersistentStatementInformation emptyStatement, byte[] params, boolean batch) throws Exception {
         FSTObjectInput input = fstConfiguration.getObjectInput(params);
 
         if (batch) {
             emptyStatement.batch = true;
-            emptyStatement.batchParametersValues = (ArrayList<ArrayList<StatementParameter>>) input.readObject(ArrayList.class, StatementParameter.class);
+            emptyStatement.batchParametersValues = (ArrayList<Map<Integer, Serializable>>) input.readObject(ArrayList.class, Integer.class, HashMap.class);
         } else {
-            emptyStatement.parameterValues = (ArrayList<StatementParameter>) input.readObject(ArrayList.class, StatementParameter.class);
+            emptyStatement.parameterValues = (Map<Integer, Serializable>) input.readObject(HashMap.class, Integer.class, Serializable.class);
         }
     }
 
