@@ -175,7 +175,7 @@ public class PersistentStatementInformation extends StatementInformation {
 
         if (batch) {
             emptyStatement.batch = true;
-            emptyStatement.batchParametersValues = (ArrayList<Map<Integer, Serializable>>) input.readObject(ArrayList.class, Integer.class, HashMap.class);
+            emptyStatement.batchParametersValues = (ArrayList<Map<Integer, Serializable>>) input.readObject(ArrayList.class, HashMap.class, Integer.class, Serializable.class);
         } else {
             emptyStatement.parameterValues = (Map<Integer, Serializable>) input.readObject(HashMap.class, Integer.class, Serializable.class);
         }
