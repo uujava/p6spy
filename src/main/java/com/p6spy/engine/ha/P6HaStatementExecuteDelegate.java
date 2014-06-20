@@ -25,6 +25,8 @@ import com.p6spy.engine.proxy.Delegate;
 import java.lang.reflect.Method;
 import java.sql.ResultSet;
 
+import static java.lang.Boolean.TRUE;
+
 /**
  * User: kataev
  * Date: 11.06.14
@@ -46,7 +48,7 @@ public class P6HaStatementExecuteDelegate implements Delegate {
 
         Object result = method.invoke(underlying, args);
 
-        if (executeListener != null && result != null && !(result instanceof ResultSet)) {
+        if (executeListener != null && result != null && !(result instanceof ResultSet) && !TRUE.equals(result)) {
             executeListener.onExecute(statementInformation);
         }
         return result;
