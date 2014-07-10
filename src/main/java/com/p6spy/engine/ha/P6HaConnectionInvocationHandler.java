@@ -45,6 +45,7 @@ public class P6HaConnectionInvocationHandler extends GenericInvocationHandler<Co
         P6HaConnectionPrepareStatementDelegate prepareStatementDelegate = new P6HaConnectionPrepareStatementDelegate(connectionInformation);
         P6HaConnectionCreateStatementDelegate createStatementDelegate = new P6HaConnectionCreateStatementDelegate(connectionInformation);
         P6HaConnectionAutoCommitDelegate autoCommitDelegate = new P6HaConnectionAutoCommitDelegate(connectionInformation);
+        P6HaConnectionCloseDelegate closeDelegate = new P6HaConnectionCloseDelegate(connectionInformation);
         // prepare call ?
 
         addDelegate(
@@ -70,6 +71,11 @@ public class P6HaConnectionInvocationHandler extends GenericInvocationHandler<Co
         addDelegate(
                 new MethodNameMatcher("setAutoCommit"),
                 autoCommitDelegate
+        );
+
+        addDelegate(
+                new MethodNameMatcher("close"),
+                closeDelegate
         );
     }
 }

@@ -37,4 +37,6 @@ public interface HaStatementExecuteListener extends EventListener {
     void onCommit(ConnectionInformation connectionInformation);
 
     void onRollback(ConnectionInformation connectionInformation);
+
+    void onClose(ConnectionInformation connectionInformation);
 }
