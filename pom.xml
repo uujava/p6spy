@@ -9,8 +9,12 @@
     </parent>
     <packaging>jar</packaging>
 
+    <!--
+       SOURCES AT https://github.com/sunnyfnc/p6spy
+    -->
+
     <groupId>p6spy</groupId>
-    <artifactId>p6spy</artifactId>
+    <artifactId>p6spyst</artifactId>
     <name>P6Spy</name>
     <version>2.1.1-SNAPSHOT</version>
     <organization>
@@ -18,11 +22,11 @@
     </organization>
     <inceptionYear>2002</inceptionYear>
     <description>
-        P6Spy is an open source framework for applications that intercept and optionally modify database
-        statements.
+        P6Spy is an open source framework for applications that intercept and optionally send
+        statements to listener
     </description>
 
-    <url>http://p6spy.github.io/p6spy/</url>
+    <url>https://github.com/sunnyfnc/p6spy</url>
 
     <mailingLists>
         <mailingList>
