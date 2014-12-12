@@ -81,13 +81,13 @@ public class BatchFileLogger extends FileLogger {
 
     @Override
     public void setLogfile(String fileName) {
-        try {
+       /* try {
             boolean append = P6SpyOptions.getActiveInstance().getAppend();
             endOfStatement = append && 0L < new File(fileName).length();
             qlog = new PrintStream(new FileOutputStream(fileName, append));
         } catch (IOException e) {
             e.printStackTrace(System.err);
-        }
+        }*/
     }
 
     public static final char BATCH_SEPARATOR = ';';

@@ -195,7 +195,7 @@ public class P6ModuleManager {
                 } catch (Exception e) {
                     String err = "Error registering driver names: "
                             + driverNames + " \nCaused By: " + e.toString();
-                    P6LogQuery.error(err);
+                    //P6LogQuery.error(err);
                 }
             }
         }
