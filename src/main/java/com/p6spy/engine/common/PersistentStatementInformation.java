@@ -19,19 +19,22 @@
  */
 package com.p6spy.engine.common;
 
-import de.ruedigermoeller.serialization.FSTConfiguration;
-import de.ruedigermoeller.serialization.FSTObjectInput;
-import de.ruedigermoeller.serialization.FSTObjectOutput;
+
+import org.nustaq.serialization.FSTConfiguration;
 
 import javax.sql.rowset.serial.SerialBlob;
 import javax.sql.rowset.serial.SerialClob;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import javax.sql.rowset.serial.SerialException;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.Reader;
 import java.io.Serializable;
 import java.sql.Blob;
 import java.sql.Clob;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,165 +44,176 @@ import java.util.Map;
  */
 public class PersistentStatementInformation extends StatementInformation {
 
-    private Map<Integer, Serializable> parameterValues = new HashMap<Integer, Serializable>();
+	private Map<Integer, Serializable> parameterValues = new HashMap<Integer, Serializable>(10);
 
-    private ArrayList<Map<Integer, Serializable>> batchParametersValues;
+	private ArrayList<Map<Integer, Serializable>> batchParametersValues;
 
-    private boolean batch;
+	private boolean batch;
 
-    private Long id;
+	private Long id;
 
-    static FSTConfiguration fstConfiguration = FSTConfiguration.createDefaultConfiguration();
+	static FSTConfiguration fstConfiguration = FSTConfiguration.createDefaultConfiguration();
 
-    public PersistentStatementInformation(ConnectionInformation connectionInformation) {
-        super(connectionInformation);
-    }
+	static {
+		fstConfiguration.registerClass(ArrayList.class, HashMap.class, Integer.class, Timestamp.class, Date.class, Long.class);
+	}
 
-    public PersistentStatementInformation(PersistentStatementInformation original) {
-        super(original.connectionInformation);
-        setStatementQuery(original.getStatementQuery());
-        parameterValues.putAll(original.getParameterValues());
-        if (original.isBatch()) {
-            batch = true;
-            batchParametersValues = new ArrayList<Map<Integer, Serializable>>(original.getBatchParametersValues());
-        }
-    }
+	public PersistentStatementInformation(ConnectionInformation connectionInformation) {
+		super(connectionInformation);
+	}
 
-    public byte[] getSerializedValues() {
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+	public PersistentStatementInformation(PersistentStatementInformation original) {
+		super(original.connectionInformation);
+		setStatementQuery(original.getStatementQuery());
+		parameterValues.putAll(original.getParameterValues());
+		if (original.isBatch()) {
+			batch = true;
+			batchParametersValues = new ArrayList<Map<Integer, Serializable>>(original.getBatchParametersValues());
+		}
+	}
 
-        FSTObjectOutput out = fstConfiguration.getObjectOutput(stream);
-        try {
-            out.writeObject(parameterValues, HashMap.class, Integer.class, Serializable.class);
-            out.flush();
-            stream.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new RuntimeException("Cannot serialize statement parameters");
-        }
+	public byte[] getSerializedValues() {
+		return fstConfiguration.asByteArray(parameterValues);
+	}
 
-        return stream.toByteArray();
-    }
+	public byte[] getSerializedBatchValues() {
+		if (batchParametersValues == null) {
+			throw new RuntimeException("Batch parameters not found");
+		}
 
-    public byte[] getSerializedBatchValues() {
-        if (batchParametersValues == null) {
-            throw new RuntimeException("Batch parameters not found");
-        }
+		return fstConfiguration.asByteArray(batchParametersValues);
+	}
 
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+	/**
+	 * Records the value of a parameter.
+	 *
+	 * @param position the position of the parameter (starts with 1 not 0)
+	 * @param value    the value of the parameter
+	 */
+	public void setParameterValue(final int position, final Object value) {
+		Serializable parameterValue = null;
 
-        FSTObjectOutput out = fstConfiguration.getObjectOutput(stream);
-        try {
-            out.writeObject(batchParametersValues, ArrayList.class, HashMap.class, Integer.class);
-            out.flush();
-            stream.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new RuntimeException("Cannot serialize batch statement parameters");
-        }
+		if (value != null) {
+			if (!(value instanceof Serializable)) {
+				parameterValue = trySerializable(value);
+			} else {
+				parameterValue = (Serializable) value;
+			}
+		}
 
-        return stream.toByteArray();
-    }
+		parameterValues.put(position, parameterValue);
+	}
 
-    /**
-     * Records the value of a parameter.
-     *
-     * @param position the position of the parameter (starts with 1 not 0)
-     * @param value    the value of the parameter
-     */
-    public void setParameterValue(final int position, final Object value) {
-        Serializable parameterValue = null;
+	private Serializable trySerializable(final Object value) {
+		if (value instanceof Blob) {
+			try {
+				Blob blob = (Blob) value;
+				byte[] bbuf = blob.getBytes(1, (int) blob.length());
+				return new SerialBlob(bbuf);
+			} catch (SQLException e) {
+				e.printStackTrace();
+				throw new IllegalArgumentException("Illegal Blob parameter " + e.getMessage());
+			}
+		} else if (value instanceof Clob) {
+			try {
+				Clob clob = (Clob) value;
+				int len = (int) clob.length();
+				char[] cbuf = new char[len];
+				int read;
+				int offset = 0;
 
-        if (value != null) {
-            if (!(value instanceof Serializable)) {
-                parameterValue = trySerializable(value);
-            } else {
-                parameterValue = (Serializable) value;
-            }
-        }
+				try (Reader charStream = clob.getCharacterStream()) {
+					if (charStream == null) {
+						throw new SQLException("Invalid Clob object. The call to getCharacterStream " +
+								"returned null which cannot be serialized.");
+					}
 
-        parameterValues.put(position, parameterValue);
-    }
+					// Note: get an ASCII stream in order to null-check it,
+					// even though we don't do anything with it.
+					try (InputStream asciiStream = clob.getAsciiStream()) {
+						if (asciiStream == null) {
+							throw new SQLException("Invalid Clob object. The call to getAsciiStream " +
+									"returned null which cannot be serialized.");
+						}
+					}
 
-    private Serializable trySerializable(final Object value) {
-        if (value instanceof Blob) {
-            try {
-                return new SerialBlob((Blob) value);
-            } catch (SQLException e) {
-                e.printStackTrace();
-                throw new IllegalArgumentException("Illegal Blob parameter " + e.getMessage());
-            }
-        } else if (value instanceof Clob) {
-            try {
-                return new SerialClob((Clob) value);
-            } catch (SQLException e) {
-                e.printStackTrace();
-                throw new IllegalArgumentException("Illegal Clob parameter " + e.getMessage());
-            }
-        } else {
-            // TODO look at more cases
-            throw new IllegalArgumentException("Non serializable parameter value " + value);
-        }
-    }
+					try (Reader reader = new BufferedReader(charStream)) {
+						do {
+							read = reader.read(cbuf, offset, (len - offset));
+							offset += read;
+						} while (read > 0);
+					}
+				} catch (java.io.IOException ex) {
+					throw new SerialException("SerialClob: " + ex.getMessage());
+				}
 
-    public void addBatch() {
-        batch = true;
-        if (batchParametersValues == null) {
-            batchParametersValues = new ArrayList<Map<Integer, Serializable>>();
-        }
+				return new SerialClob(cbuf);
+			} catch (SQLException e) {
+				e.printStackTrace();
+				throw new IllegalArgumentException("Illegal Clob parameter " + e.getMessage());
+			}
+		} else {
+			// TODO look at more cases
+			throw new IllegalArgumentException("Non serializable parameter value " + value);
+		}
+	}
 
-        if (!parameterValues.isEmpty()) {
-            batchParametersValues.add(new HashMap<Integer, Serializable>(parameterValues));
-            parameterValues.clear();
-        }
-    }
+	public void addBatch() {
+		batch = true;
+		if (batchParametersValues == null) {
+			batchParametersValues = new ArrayList<Map<Integer, Serializable>>();
+		}
 
-    public Map<Integer, Serializable> getParameterValues() {
-        return parameterValues;
-    }
+		if (!parameterValues.isEmpty()) {
+			batchParametersValues.add(new HashMap<Integer, Serializable>(parameterValues));
+			parameterValues.clear();
+		}
+	}
 
-    public ArrayList<Map<Integer, Serializable>> getBatchParametersValues() {
-        return batchParametersValues;
-    }
+	public Map<Integer, Serializable> getParameterValues() {
+		return parameterValues;
+	}
 
-    public boolean isBatch() {
-        return batch;
-    }
+	public ArrayList<Map<Integer, Serializable>> getBatchParametersValues() {
+		return batchParametersValues;
+	}
 
-    public Long getId() {
-        return id;
-    }
+	public boolean isBatch() {
+		return batch;
+	}
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+	public Long getId() {
+		return id;
+	}
 
-    public void clearParameters() {
-        parameterValues.clear();
-        if (batchParametersValues != null) {
-            batchParametersValues.clear();
-        }
-    }
+	public void setId(Long id) {
+		this.id = id;
+	}
 
-    @SuppressWarnings("unchecked")
-    public static void fillParameters(PersistentStatementInformation emptyStatement, byte[] params, boolean batch) throws Exception {
-        FSTObjectInput input = fstConfiguration.getObjectInput(params);
+	public void clearParameters() {
+		parameterValues.clear();
+		if (batchParametersValues != null) {
+			batchParametersValues.clear();
+		}
+	}
 
-        if (batch) {
-            emptyStatement.batch = true;
-            emptyStatement.batchParametersValues = (ArrayList<Map<Integer, Serializable>>) input.readObject(ArrayList.class, HashMap.class, Integer.class, Serializable.class);
-        } else {
-            emptyStatement.parameterValues = (Map<Integer, Serializable>) input.readObject(HashMap.class, Integer.class, Serializable.class);
-        }
-    }
+	@SuppressWarnings("unchecked")
+	public static void fillParameters(PersistentStatementInformation emptyStatement, byte[] params, boolean batch) throws Exception {
+		if (batch) {
+			emptyStatement.batch = true;
+			emptyStatement.batchParametersValues = (ArrayList<Map<Integer, Serializable>>) fstConfiguration.asObject(params);
+		} else {
+			emptyStatement.parameterValues = (Map<Integer, Serializable>) fstConfiguration.asObject(params);
+		}
+	}
 
-    @Override
-    public String toString() {
-        return "PersistentStatementInformation{" +
-                "id=" + id +
-                ", connectionId=" + getConnectionId() +
-                ", sql=" + getSql() +
-                ", batch=" + batch +
-                '}';
-    }
+	@Override
+	public String toString() {
+		return "PersistentStatementInformation{" +
+				"id=" + id +
+				", connectionId=" + getConnectionId() +
+				", sql=" + getSql() +
+				", batch=" + batch +
+				'}';
+	}
 }
