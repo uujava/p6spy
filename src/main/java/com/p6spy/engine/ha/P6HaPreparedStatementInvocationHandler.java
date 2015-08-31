@@ -45,12 +45,13 @@ public class P6HaPreparedStatementInvocationHandler extends GenericInvocationHan
         statementInformation.setStatementQuery(query);
 
         P6HaPreparedStatementExecuteDelegate executeDelegate = new P6HaPreparedStatementExecuteDelegate(statementInformation);
-        P6HaPreparedStatementAddBatchDelegate addBatchDelegate = new P6HaPreparedStatementAddBatchDelegate(statementInformation);
+	    P6HaPreparedStatementExecuteBatchDelegate executeBatchDelegate = new P6HaPreparedStatementExecuteBatchDelegate(statementInformation);
+	    P6HaPreparedStatementAddBatchDelegate addBatchDelegate = new P6HaPreparedStatementAddBatchDelegate(statementInformation);
         P6HaPreparedStatementSetParameterDelegate setParameterDelegate = new P6HaPreparedStatementSetParameterDelegate(statementInformation);
 
         addDelegate(
                 new MethodNameMatcher("executeBatch"),
-                executeDelegate
+		        executeBatchDelegate
         );
         addDelegate(
                 new MethodNameMatcher("addBatch"),
