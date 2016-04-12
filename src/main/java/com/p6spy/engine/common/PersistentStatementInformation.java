@@ -55,7 +55,13 @@ public class PersistentStatementInformation extends StatementInformation {
 	static FSTConfiguration fstConfiguration = FSTConfiguration.createDefaultConfiguration();
 
 	static {
-		fstConfiguration.registerClass(ArrayList.class, HashMap.class, Integer.class, Timestamp.class, Date.class, Long.class);
+		fstConfiguration.registerClass(ArrayList.class, HashMap.class,
+				Integer.class,
+				Timestamp.class,
+				Date.class,
+				Long.class,
+				java.sql.Time.class,
+				java.sql.Date.class);
 	}
 
 	public PersistentStatementInformation(ConnectionInformation connectionInformation) {
