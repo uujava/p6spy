@@ -26,7 +26,11 @@ package com.p6spy.engine.common;
 public class ConnectionInformation {
 
   private static int counter = 0;
-  private final int connectionId = counter++;
+  private final int connectionId = nextId();
+
+  private static synchronized int nextId() {
+    return counter++;
+  }
 
   public int getConnectionId() {
     return connectionId;
